@@ -1,0 +1,14 @@
+{
+    "name": "herihaja/taskflowtest",
+    "autoload": {
+        "psr-4": {
+            "Herihaja\\Taskflowtest\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "herihaja"
+        }
+    ],
+    "require": {}
+}
