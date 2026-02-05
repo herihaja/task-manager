@@ -19,7 +19,7 @@ class TaskService
                 'description' => $data['description'] ?? null,
                 'category_id' => $data['category_id'] ?? null,
                 'priority' => $data['priority'] ?? 'medium',
-                'due_date' => $data['due_date'] ?? null,
+                'due_date' => $data['due_date'] ?: null,
             ]);
         });
     }
@@ -69,6 +69,23 @@ class TaskService
             ->where('category_id', $categoryId)
             ->with('category')
             ->get();
+    }
+
+    public function searchTasks(User $user, string $searchTerm, string $status): Collection
+    {
+        $query = Task::where('user_id', $user->id);
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($searchTerm) {
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                ->orWhere('description', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        return $query->with('category')->get();
     }
 
     public function getTasksForUser(int $userId): Collection
