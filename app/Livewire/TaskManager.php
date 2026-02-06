@@ -102,6 +102,13 @@ class TaskManager extends Component
         $this->resetPage();
     }
 
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->statusFilter = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
         return view('livewire.task-manager', [
