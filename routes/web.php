@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Livewire\TaskManager;
+use App\Http\Controllers\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::middleware('auth')->get('/task-manager', TaskManager::class);
+Route::middleware('auth')->get('/task-manager', TaskManager::class)->name('task-manager');
+
+Route::middleware('auth')->get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+
 
 require __DIR__.'/auth.php';

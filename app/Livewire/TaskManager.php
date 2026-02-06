@@ -6,9 +6,12 @@ use App\Models\Task;
 use Livewire\Component;
 use App\Services\TaskService;
 use App\Services\CategoryService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TaskManager extends Component
 {
+    use AuthorizesRequests;
+
     public $tasks;
     public $categories;
     public $title, $description, $priority, $due_date, $category_id, $taskId, $status;
@@ -49,7 +52,7 @@ class TaskManager extends Component
 
         if ($this->taskId) {
             $task = Task::findOrFail($this->taskId);
-            if ($task->user_id !== auth()->id()) abort(403);
+            $this->authorize('update', $task);
 
             $this->taskService->updateTask($task, $data);
         } else {
@@ -74,7 +77,7 @@ class TaskManager extends Component
     public function edit($id)
     {
         $task = Task::findOrFail($id);
-        if ($task->user_id !== auth()->id()) abort(403);
+        $this->authorize('view', $task);
 
         $this->title = $task->title;
         $this->description = $task->description;
@@ -88,7 +91,7 @@ class TaskManager extends Component
     public function delete($id)
     {
         $task = Task::findOrFail($id);
-        if ($task->user_id !== auth()->id()) abort(403);
+        $this->authorize('delete', $task);
 
         $this->taskService->deleteTask($task);
         $this->refreshTasks();

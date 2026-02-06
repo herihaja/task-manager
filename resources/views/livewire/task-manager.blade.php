@@ -100,7 +100,11 @@
             <tbody>
                 @foreach($tasks as $task)
                 <tr>
-                    <td>{{ $task->title }}</td>
+                    <td>
+                        <a href="{{ route('tasks.show', $task->id) }}">
+                            {{ $task->title }}
+                        </a>
+                    </td>
                     <td>{{ $task->category?->name }}</td>
                     <td>{{ $task->status }}</td>
                     <td>{{ $task->priority }}</td>
