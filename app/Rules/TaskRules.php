@@ -4,9 +4,10 @@ namespace App\Rules;
 
 class TaskRules
 {
-    public static function rules(): array
+    public static function rules(bool $isUpdate=false): array
     {
-        return [
+
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high',
@@ -14,6 +15,14 @@ class TaskRules
             'due_date' => 'nullable|date',
             'category_id' => 'nullable|exists:categories,id',
         ];
+
+        if ($isUpdate) {
+            $rules['title'] = 'sometimes|' . $rules['title'];
+            $rules['priority'] = 'sometimes|' . $rules['priority'];
+            $rules['status'] = 'sometimes|' . $rules['status'];
+        }
+
+        return $rules;
     }
 
     public static function messages(): array

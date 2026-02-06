@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Task;
-use Illuminate\Support\Collection;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -36,43 +35,7 @@ class TaskService
         $task->delete();
     }
 
-    public function markTaskAsCompleted(Task $task): Task
-    {
-        $task->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
-
-        return $task;
-    }
-
-    public function markTaskAsInProgress(Task $task): Task
-    {
-        $task->update([
-            'status' => 'in_progress',
-            'completed_at' => null,
-        ]);
-
-        return $task;
-    }
-
-    public function getTasksByStatus(User $user, string $status): Collection
-    {
-        return Task::where('user_id', $user->id)
-            ->where('status', $status)
-            ->with('category')
-            ->get();
-    }
-
-    public function getTasksByCategory(User $user, int $categoryId): Collection
-    {
-        return Task::where('user_id', $user->id)
-            ->where('category_id', $categoryId)
-            ->with('category')
-            ->get();
-    }
-
-    public function searchTasks(User $user, string $searchTerm, string $status, $perPage=20): LengthAwarePaginator
+    public function searchTasks(User $user, string $searchTerm='', string $status='', $perPage=20): LengthAwarePaginator
     {
         $query = Task::where('user_id', $user->id);
         if ($status) {
@@ -87,10 +50,5 @@ class TaskService
         }
 
         return $query->with('category')->paginate($perPage);
-    }
-
-    public function getTasksForUser(int $userId): Collection
-    {
-        return Task::where('user_id', $userId)->with('category')->get();
     }
 }

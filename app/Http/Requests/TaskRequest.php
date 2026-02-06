@@ -22,7 +22,9 @@ class TaskRequest extends FormRequest
      */
     public function rules(): array
     {
-        return TaskRules::rules();
+        $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
+
+        return TaskRules::rules($isUpdate);
     }
 
     public function messages(): array

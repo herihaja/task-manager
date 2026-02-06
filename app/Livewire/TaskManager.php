@@ -24,11 +24,6 @@ class TaskManager extends Component
     private $taskService;
     private $categoryService;
 
-    protected function rules()
-    {
-        return TaskRules::rules();
-    }
-
     protected function messages()
     {
         return TaskRules::messages();
@@ -48,7 +43,8 @@ class TaskManager extends Component
 
     public function save()
     {
-        $data = $this->validate($this->rules(), $this->messages());
+        $rules = $this->taskId ? TaskRules::rules(true) : TaskRules::rules();
+        $data = $this->validate($rules, $this->messages());
 
         if ($this->taskId) {
             $task = Task::findOrFail($this->taskId);
