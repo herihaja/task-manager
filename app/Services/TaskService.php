@@ -6,6 +6,7 @@ use App\Models\Task;
 use Illuminate\Support\Collection;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class TaskService
 {
@@ -71,7 +72,7 @@ class TaskService
             ->get();
     }
 
-    public function searchTasks(User $user, string $searchTerm, string $status): Collection
+    public function searchTasks(User $user, string $searchTerm, string $status, $perPage=20): LengthAwarePaginator
     {
         $query = Task::where('user_id', $user->id);
         if ($status) {
@@ -85,7 +86,7 @@ class TaskService
             });
         }
 
-        return $query->with('category')->get();
+        return $query->with('category')->paginate($perPage);
     }
 
     public function getTasksForUser(int $userId): Collection

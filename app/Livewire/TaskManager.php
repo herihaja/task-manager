@@ -3,16 +3,19 @@
 namespace App\Livewire;
 
 use App\Models\Task;
+use App\Rules\TaskRules;
 use Livewire\Component;
 use App\Services\TaskService;
 use App\Services\CategoryService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
+use Livewire\WithPagination;
+
 class TaskManager extends Component
 {
     use AuthorizesRequests;
+    use WithPagination;
 
-    public $tasks;
     public $categories;
     public $title, $description, $priority, $due_date, $category_id, $taskId, $status;
     public $search = '';
@@ -23,14 +26,12 @@ class TaskManager extends Component
 
     protected function rules()
     {
-        return [
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'priority' => 'required|in:low,medium,high',
-            'status' => 'required|in:pending,in_progress,completed',
-            'due_date' => 'nullable|date',
-            'category_id' => 'nullable|exists:categories,id',
-        ];
+        return TaskRules::rules();
+    }
+
+    protected function messages()
+    {
+        return TaskRules::messages();
     }
 
     public function boot(TaskService $taskService, CategoryService $categoryService)
@@ -41,14 +42,13 @@ class TaskManager extends Component
 
     public function mount()
     {
-        $this->tasks = $this->taskService->getTasksForUser(auth()->user()->id);
         $this->categories = $this->categoryService->getCategoriesByUser(auth()->user());
         $this->resetInputFields();
     }
 
     public function save()
     {
-        $data = $this->validate();
+        $data = $this->validate($this->rules(), $this->messages());
 
         if ($this->taskId) {
             $task = Task::findOrFail($this->taskId);
@@ -60,7 +60,6 @@ class TaskManager extends Component
         }
 
         $this->resetInputFields();
-        $this->refreshTasks();
     }
 
     public function resetInputFields()
@@ -94,27 +93,27 @@ class TaskManager extends Component
         $this->authorize('delete', $task);
 
         $this->taskService->deleteTask($task);
-        $this->refreshTasks();
         $this->resetInputFields();
     }
 
-    public function updatedStatusFilter($value)
+    public function updatedStatusFilter()
     {
-        $this->refreshTasks();
+        $this->resetPage();
     }
 
     public function updatedSearch()
     {
-        $this->refreshTasks();
+        $this->resetPage();
     }
 
     public function render()
     {
-        return view('livewire.task-manager');
-    }
-
-    private function refreshTasks()
-    {
-        $this->tasks = $this->taskService->searchTasks(auth()->user(), $this->search, $this->statusFilter);
+        return view('livewire.task-manager', [
+            'tasks' => $this->taskService->searchTasks(
+                auth()->user(),
+                $this->search,
+                $this->statusFilter
+            )
+        ]);
     }
 }

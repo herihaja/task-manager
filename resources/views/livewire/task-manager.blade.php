@@ -108,7 +108,7 @@
                     <td>{{ $task->category?->name }}</td>
                     <td>{{ $task->status }}</td>
                     <td>{{ $task->priority }}</td>
-                    <td>{{ $task->due_date }}</td>
+                    <td>{{ $task->due_date?->format("d/m/Y") }}</td>
                     <td>
                         <button wire:click="edit({{ $task->id }})">Edit</button>
                         <button wire:click="delete({{ $task->id }})">Delete</button>
@@ -117,5 +117,6 @@
                 @endforeach
             </tbody>
         </table>
+        {{ $tasks->links() }}
     </div>
 </div>

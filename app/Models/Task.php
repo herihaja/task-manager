@@ -20,6 +20,10 @@ class Task extends Model
         'due_date',
     ];
 
+    protected $casts = [
+        'due_date' => 'date',
+    ];
+
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
