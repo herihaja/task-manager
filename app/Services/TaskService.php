@@ -19,7 +19,7 @@ class TaskService
                 'description' => $data['description'] ?? null,
                 'category_id' => $data['category_id'] ?? null,
                 'priority' => $data['priority'] ?? 'medium',
-                'due_date' => $data['due_date'] ?: null,
+                'due_date' => $data['due_date'] ?? null,
             ]);
         });
     }

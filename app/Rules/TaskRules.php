@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Rules;
+use Illuminate\Validation\Rule;
 
 class TaskRules
 {
@@ -13,7 +14,12 @@ class TaskRules
             'priority' => 'required|in:low,medium,high',
             'status' => 'required|in:pending,in_progress,completed',
             'due_date' => 'nullable|date',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => [
+                'nullable',
+                Rule::exists('categories', 'id')->where(function ($query) {
+                    $query->where('user_id', auth()->id());
+                }),
+            ],
         ];
 
         if ($isUpdate) {

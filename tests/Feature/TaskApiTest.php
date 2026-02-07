@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Task;
+use App\Models\Category;
 
 class TaskApiTest extends TestCase
 {
@@ -188,5 +189,30 @@ class TaskApiTest extends TestCase
             ->getJson('/api/tasks?search=laundry&status=pending')
             ->assertJsonCount(1, 'data')
             ->assertJsonFragment(['title' => 'Do laundry']);
+    }
+
+    /** @test */
+    public function user_should_not_be_able_to_use_category_he_does_not_own()
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        // Category owned by another user
+        $otherCategory = Category::factory()->create([
+            'user_id' => $otherUser->id,
+        ]);
+
+        $payload = [
+            'title' => 'Test task',
+            'priority' => 'low',
+            'status' => 'pending',
+            'category_id' => $otherCategory->id,
+            'due_date' => now()->addWeek()->toDateString(),
+        ];
+
+        $this->actingAs($user)
+            ->postJson('/api/tasks', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['category_id']);
     }
 }
